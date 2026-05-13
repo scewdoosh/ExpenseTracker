@@ -13,29 +13,25 @@ import com.cosa.repo.IUserModelRepo;
 @Service
 public class PaymentService {
 
-    @Autowired
-    private IPaymentRepo paymentRepository;
+	@Autowired
+	private IPaymentRepo paymentRepository;
 
-    @Autowired
-    private IUserModelRepo userRepository;
+	@Autowired
+	private IUserModelRepo userRepository;
 
-    public Payment addAmount(String email, BigDecimal amount) {
-        UserModel user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+	public Payment addAmount(String email, BigDecimal amount) {
+		UserModel user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 
-        Payment payment = paymentRepository.findByUserModel(user)
-                .orElse(new Payment());
+		Payment payment = paymentRepository.findByUserModel(user).orElse(new Payment());
 
-        payment.setUserModel(user);
-        payment.setTotalAmount(payment.getTotalAmount() == null ? amount : payment.getTotalAmount().add(amount));
+		payment.setUserModel(user);
+		payment.setTotalAmount(payment.getTotalAmount() == null ? amount : payment.getTotalAmount().add(amount));
 
-        return paymentRepository.save(payment);
-    }
+		return paymentRepository.save(payment);
+	}
 
-    public Payment getTotal(String email) {
-        UserModel user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return paymentRepository.findByUserModel(user)
-                .orElseThrow(() -> new RuntimeException("No payments found"));
-    }
+	public Payment getTotal(String email) {
+		UserModel user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+		return paymentRepository.findByUserModel(user).orElse(null);
+	}
 }

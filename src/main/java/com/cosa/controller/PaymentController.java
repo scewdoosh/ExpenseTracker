@@ -32,6 +32,10 @@ public class PaymentController {
 	@GetMapping("/total")
 	public ResponseEntity<Payment> getTotal(HttpServletRequest request) {
 		String email = (String) request.getAttribute("email");
-		return ResponseEntity.ok(paymentService.getTotal(email));
+		Payment payment = paymentService.getTotal(email);
+		if (payment == null) {
+			return ResponseEntity.ok(null);
+		}
+		return ResponseEntity.ok(payment);
 	}
 }
