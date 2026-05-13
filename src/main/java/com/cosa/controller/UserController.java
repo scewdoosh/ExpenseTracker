@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cosa.model.UserModel;
 import com.cosa.service.UserService;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,17 +24,24 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-	@PostMapping("/signup")
-	public ResponseEntity<UserModel> signup(@Valid @RequestBody UserModel user) {
-		return ResponseEntity.ok(userService.signup(user));
-	}
-
 	@PostMapping("/signin")
-	public ResponseEntity<String> signin(@RequestBody UserModel user) {
-		String token = userService.signin(user.getEmail(), user.getPassword());
-		return ResponseEntity.ok(token);
+	public ResponseEntity<String> signin(@RequestBody UserModel user, HttpServletResponse response) {
+	    String token = userService.signin(user.getEmail(), user.getPassword());
+	    
+	    Cookie cookie = new Cookie("token", token);
+	    cookie.setHttpOnly(true);
+	    cookie.setPath("/");
+	    cookie.setMaxAge(60 * 60 * 24 * 30);
+	    response.addCookie(cookie);
+	    
+	    return ResponseEntity.ok("Login successful");
 	}
-
+	
+	@PostMapping("/signup")
+	public ResponseEntity<UserModel> signup(@RequestBody UserModel user) {
+	    return ResponseEntity.ok(userService.signup(user));
+	}
+	
 	@PutMapping("/update-webhook")
 	public ResponseEntity<UserModel> updateWebhook(@RequestBody Map<String, String> body, HttpServletRequest request) {
 		String email = (String) request.getAttribute("email");

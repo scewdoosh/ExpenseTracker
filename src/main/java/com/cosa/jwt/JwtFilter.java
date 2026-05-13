@@ -14,6 +14,7 @@ import com.cosa.service.UserDetailsServiceImpl;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -29,14 +30,23 @@ public class JwtFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		String authHeader = request.getHeader("Authorization");
 		String token = null;
 		String email = null;
 
-		if (authHeader != null && authHeader.startsWith("Bearer ")) {
-			token = authHeader.substring(7);
-			email = jwtUtil.extractUsername(token);
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+		    for (Cookie cookie : cookies) {
+		        if (cookie.getName().equals("token")) {
+		            token = cookie.getValue();
+		            break;
+		        }
+		    }
 		}
+
+		if (token != null) {
+		    email = jwtUtil.extractUsername(token);
+		}
+
 		if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 		    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 		    if (jwtUtil.isTokenValid(token, userDetails)) {

@@ -6,6 +6,8 @@ export default function Dashboard() {
     const [total, setTotal] = useState(0);
     const [amount, setAmount] = useState("");
     const [webhook, setWebhook] = useState("");
+    const [webhookSaved, setWebhookSaved] = useState(false);
+    const [editWebhook, setEditWebhook] = useState(false);
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
 
@@ -38,6 +40,8 @@ export default function Dashboard() {
         try {
             await updateWebhook({ webhookUrl: webhook });
             setMessage("Webhook updated!");
+            setWebhookSaved(true);
+            setEditWebhook(false);
         } catch (err) {
             setMessage("Failed to update webhook!");
         }
@@ -51,49 +55,98 @@ export default function Dashboard() {
     return (
         <div style={{ minHeight: "100vh", background: "#0a0a0f", color: "#e8e0d5", padding: 24 }}>
             <div style={{ maxWidth: 480, margin: "0 auto" }}>
+                
+                {/* Header */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-                    <h2 style={{ color: "#f0e8d8" }}>Expense Tracker</h2>
-                    <button onClick={logout} style={{ background: "#ef4444", border: "none", color: "#fff", borderRadius: 8, padding: "8px 16px", cursor: "pointer" }}>Logout</button>
+                    <h2 style={{ color: "#f0e8d8", margin: 0 }}>Expense Tracker</h2>
+                    <button onClick={logout} style={{ background: "#ef4444", border: "none", color: "#fff", borderRadius: 8, padding: "8px 16px", cursor: "pointer" }}>
+                        Logout
+                    </button>
                 </div>
 
                 {/* Total */}
                 <div style={{ background: "#141020", border: "1px solid #2a2040", borderRadius: 16, padding: 24, marginBottom: 16, textAlign: "center" }}>
                     <div style={{ fontSize: 13, color: "#7a6e8a", marginBottom: 8 }}>TOTAL SPENT</div>
-                    <div style={{ fontSize: 36, fontWeight: 700, color: "#f59e0b" }}>₹{total}</div>
+                    <div style={{ fontSize: 36, fontWeight: 700, color: "#f59e0b" }}>{total || 0}</div>
                 </div>
 
                 {/* Add Payment */}
                 <div style={{ background: "#141020", border: "1px solid #2a2040", borderRadius: 16, padding: 20, marginBottom: 16 }}>
                     <div style={{ fontSize: 13, color: "#9d8fbb", marginBottom: 12 }}>ADD PAYMENT</div>
-                    <input placeholder="Amount (₹)" value={amount} type="number"
+                    <input
+                        placeholder="Amount"
+                        value={amount}
+                        type="number"
                         onChange={e => setAmount(e.target.value)}
-                        style={inputStyle} />
+                        style={inputStyle}
+                    />
                     <button onClick={handleAddPayment} style={buttonStyle}>Add</button>
                 </div>
 
                 {/* Discord Webhook */}
                 <div style={{ background: "#141020", border: "1px solid #2a2040", borderRadius: 16, padding: 20 }}>
-                    <div style={{ fontSize: 13, color: "#9d8fbb", marginBottom: 12 }}>DISCORD WEBHOOK</div>
-                    <input placeholder="Paste webhook URL..." value={webhook}
-                        onChange={e => setWebhook(e.target.value)}
-                        style={inputStyle} />
-                    <button onClick={handleWebhook} style={buttonStyle}>Save</button>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                        <div style={{ fontSize: 13, color: "#9d8fbb" }}>DISCORD WEBHOOK</div>
+                        {webhookSaved && !editWebhook && (
+                            <button onClick={() => setEditWebhook(true)}
+                                style={{ background: "transparent", border: "1px solid #7c3aed", color: "#7c3aed", borderRadius: 8, padding: "4px 12px", cursor: "pointer", fontSize: 12 }}>
+                                Edit
+                            </button>
+                        )}
+                    </div>
+
+                    {!webhookSaved || editWebhook ? (
+                        <>
+                            <input
+                                placeholder="Paste webhook URL..."
+                                value={webhook}
+                                onChange={e => setWebhook(e.target.value)}
+                                style={inputStyle}
+                            />
+                            <button onClick={handleWebhook} style={buttonStyle}>Save</button>
+                        </>
+                    ) : (
+                        <div style={{ color: "#34d399", fontSize: 14 }}>✅ Webhook connected!</div>
+                    )}
                 </div>
 
-                {message && <div style={{ color: "#34d399", fontSize: 13, textAlign: "center", marginTop: 16 }}>{message}</div>}
+                    <a href="https://www.youtube.com/watch?v=xIZXDdVwNaE&t=87s" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    style={{ fontSize: 11, color: "#7c3aed", textDecoration: "none" }}>
+                    📺 How to get webhook URL?
+                    </a>
+                {message && (
+                    <div style={{ color: "#34d399", fontSize: 13, textAlign: "center", marginTop: 16 }}>
+                        {message}
+                    </div>
+                )}
             </div>
         </div>
     );
 }
 
 const inputStyle = {
-    width: "100%", background: "#0a0a0f", border: "1px solid #2a2040",
-    color: "#e8e0d5", borderRadius: 10, padding: "12px 14px",
-    fontSize: 14, marginBottom: 12, boxSizing: "border-box", outline: "none"
+    width: "100%",
+    background: "#0a0a0f",
+    border: "1px solid #2a2040",
+    color: "#e8e0d5",
+    borderRadius: 10,
+    padding: "12px 14px",
+    fontSize: 14,
+    marginBottom: 12,
+    boxSizing: "border-box",
+    outline: "none"
 };
 
 const buttonStyle = {
-    width: "100%", background: "linear-gradient(135deg, #7c3aed, #4f46e5)",
-    color: "#fff", border: "none", borderRadius: 12, padding: "13px 0",
-    fontSize: 15, fontWeight: 700, cursor: "pointer"
+    width: "100%",
+    background: "linear-gradient(135deg, #7c3aed, #4f46e5)",
+    color: "#fff",
+    border: "none",
+    borderRadius: 12,
+    padding: "13px 0",
+    fontSize: 15,
+    fontWeight: 700,
+    cursor: "pointer"
 };
