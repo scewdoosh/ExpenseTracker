@@ -27,7 +27,7 @@ public class MonthlyReportScheduler {
     @Autowired
     private DiscordService discordService;
 
-    @Scheduled(cron = "0 0 0 0 1 *") 
+    @Scheduled(cron = "0 0 0 1 * *")
     public void sendMonthlyReports() {
         List<UserModel> users = userRepository.findAll();
 
@@ -42,7 +42,7 @@ public class MonthlyReportScheduler {
 
             String message = "📊 **Monthly Report - " + lastMonth.getMonth() + " " + year + "**\n" +
                     "👤 " + user.getName() + "\n" +
-                    "💰 Total Spent: " + payment.getTotalAmount();
+                    "💰 Total Spent: ₹" + payment.getTotalAmount();
 
             discordService.sendReport(user.getDiscordWebhook(), message);
         }
