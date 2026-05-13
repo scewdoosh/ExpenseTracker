@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,13 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+	
+	@GetMapping("/me")
+	public ResponseEntity<String> me(HttpServletRequest request) {
+	    String email = (String) request.getAttribute("email");
+	    if (email == null) return ResponseEntity.status(401).build();
+	    return ResponseEntity.ok(email);
+	}
 
 	@PostMapping("/signin")
 	public ResponseEntity<String> signin(@RequestBody UserModel user, HttpServletResponse response) {

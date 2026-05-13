@@ -1,6 +1,5 @@
 package com.cosa.jwt;
 
-import java.util.Base64;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -19,12 +18,7 @@ import io.jsonwebtoken.security.Keys;
 public class JwtUtil {
 
 	@Value("${jwt.secret}")
-	private static final String SECRET_KEY;
-
-	static {
-		SecretKey secret = Jwts.SIG.HS256.key().build();
-		SECRET_KEY = Base64.getEncoder().encodeToString(secret.getEncoded());
-	}
+	private String SECRET_KEY;
 
     public String generateToken(String email) {
         return Jwts.builder()

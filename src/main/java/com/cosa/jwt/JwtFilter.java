@@ -26,39 +26,42 @@ public class JwtFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private UserDetailsServiceImpl userDetailsService;
-	
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
+
 		String token = null;
 		String email = null;
 
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
-		    for (Cookie cookie : cookies) {
-		        if (cookie.getName().equals("token")) {
-		            token = cookie.getValue();
-		            break;
-		        }
-		    }
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("token")) {
+					token = cookie.getValue();
+					break;
+				}
+			}
 		}
 
-		if (token != null) {
-		    email = jwtUtil.extractUsername(token);
-		}
+		try {
+			if (token != null) {
+				email = jwtUtil.extractUsername(token);
+			}
 
-		if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-		    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-		    if (jwtUtil.isTokenValid(token, userDetails)) {
-		        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
-		                null, userDetails.getAuthorities());
-		        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-		        SecurityContextHolder.getContext().setAuthentication(authToken);
-		        request.setAttribute("email", email);
-		    }
+			if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+				UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+				if (jwtUtil.isTokenValid(token, userDetails)) {
+					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
+							null, userDetails.getAuthorities());
+					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					SecurityContextHolder.getContext().setAuthentication(authToken);
+					request.setAttribute("email", email);
+				}
+			}
+		} catch (Exception e) {
 		}
 
 		filterChain.doFilter(request, response);
 	}
-
 }
