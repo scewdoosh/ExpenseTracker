@@ -40,6 +40,8 @@ public class UserController {
 	    cookie.setHttpOnly(true);
 	    cookie.setPath("/");
 	    cookie.setMaxAge(60 * 60 * 24 * 30);
+	    cookie.setAttribute("SameSite", "None");
+	    cookie.setSecure(true);
 	    response.addCookie(cookie);
 	    
 	    return ResponseEntity.ok("Login successful");

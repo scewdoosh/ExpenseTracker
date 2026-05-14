@@ -3,6 +3,7 @@ package com.cosa.config;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,9 +26,11 @@ import com.cosa.service.UserDetailsServiceImpl;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	@Value("${allowed.origins}")
+	private String allowedOrigins;
 
 	@Autowired
-
 	private JwtFilter jwtFilter;
 
 	@Autowired
@@ -62,16 +65,17 @@ public class SecurityConfig {
 		return http.build();
 	}
 
+
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration config = new CorsConfiguration();
-		config.addAllowedOrigin("http://localhost:3000");
-		config.addAllowedMethod("*");
-		config.addAllowedHeader("*");
-		config.setAllowCredentials(true);
-		config.setExposedHeaders(List.of("Set-Cookie"));
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", config);
-		return source;
+	    CorsConfiguration config = new CorsConfiguration();
+	    config.addAllowedOrigin(allowedOrigins);
+	    config.addAllowedMethod("*");
+	    config.addAllowedHeader("*");
+	    config.setAllowCredentials(true);
+	    config.setExposedHeaders(List.of("Set-Cookie"));
+	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	    source.registerCorsConfiguration("/**", config);
+	    return source;
 	}
 }
